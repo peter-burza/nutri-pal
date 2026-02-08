@@ -4,10 +4,19 @@ import { useState } from "react"
 import { signInWithGoogle } from "@/lib/firebase/auth"
 import { useRouter } from "next/navigation"
 import { setUserGoals, getUserGoals } from "@/lib/firebase/firestore"
+import { useEffect } from "react"
+import { useAuthStore } from "@/stores/useAuthStore"
 
 export default function LoginPage() {
   const [error, setError] = useState("")
   const router = useRouter()
+  const { user, loading } = useAuthStore()
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.push("/")
+    }
+  }, [user, loading, router])
 
   const handleGoogleLogin = async () => {
     try {
