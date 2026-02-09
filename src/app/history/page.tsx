@@ -23,6 +23,7 @@ export default function History() {
   const [editingMealId, setEditingMealId] = useState<string | null>(null)
 
   // Edit form state
+  const [editFoodName, setEditFoodName] = useState("")
   const [editMealType, setEditMealType] = useState("")
   const [editKcal, setEditKcal] = useState("")
   const [editProteins, setEditProteins] = useState("")
@@ -92,6 +93,7 @@ export default function History() {
 
   const startEditing = (meal: any) => {
     setEditingMealId(meal.id)
+    setEditFoodName(meal.foodName || meal.mealType)
     setEditMealType(meal.mealType)
     setEditKcal(meal.kcal.toString())
     setEditProteins(meal.proteins.toString())
@@ -108,6 +110,7 @@ export default function History() {
     setIsUpdating(true)
 
     const updates = {
+      foodName: editFoodName,
       mealType: editMealType,
       kcal: Number(editKcal),
       proteins: Number(editProteins),
@@ -221,114 +224,122 @@ export default function History() {
                         <thead>
                           <tr className="text-left border-b border-slate-50">
                             <th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Meal Type</th>
-                            <th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2 xs:px-4 text-center ss:text-left">Kcal</th>
-                            <th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2 xs:px-4 text-center ss:text-left">Prot.</th>
-                            <th className="hidden ss:table-cell pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2">Macros</th>
-                            <th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Edit</th>
+                            <th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 text-center">Kcal</th>
+                            <th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 text-center">Prot.</th>
+                            <th className="hidden md:table-cell pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2">Macros</th>
+                            <th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
                           {day.meals.map((meal: any) => (
                             <React.Fragment key={meal.id}>
                               <tr className={`group hover:bg-slate-50 transition-colors ${editingMealId === meal.id ? 'bg-indigo-50/30' : ''}`}>
-                                <td className="py-3 font-bold text-slate-700 text-xs xs:text-sm">{meal.mealType}</td>
-                                <td className="py-3 px-2 xs:px-4 font-black text-indigo-600 text-xs xs:text-sm text-center ss:text-left">{meal.kcal}</td>
-                                <td className="py-3 px-2 xs:px-4 font-black text-emerald-600 text-xs xs:text-sm text-center ss:text-left">{meal.proteins}g</td>
-                                <td className="hidden ss:table-cell py-3 px-2 text-[10px] font-bold text-slate-400">
+                                <td className="py-4 pr-4">
+                                  <div className="font-bold text-slate-900 text-sm truncate max-w-[150px] sm:max-w-none">{meal.foodName || meal.mealType}</div>
+                                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-tighter mt-0.5">{meal.mealType}</div>
+                                </td>
+                                <td className="py-3 px-4 font-black text-indigo-600 text-sm text-center">{meal.kcal}</td>
+                                <td className="py-3 px-4 font-black text-emerald-600 text-sm text-center">{meal.proteins}g</td>
+                                <td className="hidden md:table-cell py-3 px-2 text-[10px] font-bold text-slate-400">
                                   C: {meal.carbohydrates || 0} | F: {meal.fats || 0}
                                 </td>
                                 <td className="py-3 text-right">
                                   <div className="flex justify-end gap-1">
                                     <button
                                       onClick={() => startEditing(meal)}
-                                      className={`p-1.5 rounded transition-all cursor-pointer ${editingMealId === meal.id ? 'text-indigo-600 bg-white ring-1 ring-indigo-100' : 'text-slate-400 hover:text-indigo-600 hover:bg-indigo-50'}`}
-                                      title="Edit entry"
+                                      className={`p-1.5 rounded transition-all cursor-pointer ${editingMealId === meal.id ? 'text-indigo-600 bg-white ring-1 ring-indigo-100 shadow-sm' : 'text-slate-400 hover:text-indigo-600'}`}
                                     >
                                       <Edit2 className="h-3.5 w-3.5" />
                                     </button>
                                     <button
                                       onClick={() => handleDeleteHistoryMeal(meal.id, user!.uid)}
                                       disabled={deletingId === meal.id}
-                                      className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded transition-all disabled:opacity-30 cursor-pointer disabled:cursor-default"
-                                      title="Delete entry"
+                                      className="p-1.5 text-slate-400 hover:text-rose-600 transition-all disabled:opacity-30"
                                     >
                                       {deletingId === meal.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                                     </button>
                                   </div>
                                 </td>
                               </tr>
+
                               {editingMealId === meal.id && (
                                 <tr>
-                                  <td colSpan={5} className="p-0 border-t border-indigo-100 bg-indigo-50/20">
-                                    <div className={`grid transition-all duration-300 ease-in-out ${editingMealId === meal.id ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
-                                      <div className="overflow-visible p-4">
-                                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 items-end">
-                                          <div className="col-span-2 sm:col-span-1">
-                                            <FancySelect
-                                              label="Type"
-                                              options={MEAL_TYPES}
-                                              value={editMealType}
-                                              onChange={(value) => setEditMealType(value)}
+                                  <td colSpan={5} className="p-4 sm:p-6 border-t border-indigo-100 bg-indigo-50/20">
+                                    <div className="space-y-4">
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                          <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Description</label>
+                                          <input
+                                            type="text"
+                                            value={editFoodName}
+                                            onChange={(e) => setEditFoodName(e.target.value)}
+                                            className="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-900 outline-none focus:border-indigo-500 transition-all"
+                                          />
+                                        </div>
+                                        <div>
+                                          <FancySelect
+                                            label="Meal Type"
+                                            options={MEAL_TYPES}
+                                            value={editMealType}
+                                            onChange={(val) => setEditMealType(val)}
+                                          />
+                                        </div>
+                                      </div>
+
+                                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-end">
+                                        <div>
+                                          <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Kcal</label>
+                                          <input
+                                            type="number"
+                                            value={editKcal}
+                                            onChange={(e) => setEditKcal(e.target.value)}
+                                            className="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-900 outline-none focus:border-indigo-500 transition-all"
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Prot.</label>
+                                          <input
+                                            type="number"
+                                            value={editProteins}
+                                            onChange={(e) => setEditProteins(e.target.value)}
+                                            className="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-900 outline-none focus:border-indigo-500 transition-all"
+                                          />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2">
+                                          <div>
+                                            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">C</label>
+                                            <input
+                                              type="number"
+                                              value={editCarbs}
+                                              onChange={(e) => setEditCarbs(e.target.value)}
+                                              className="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-900 outline-none focus:border-indigo-500 transition-all"
                                             />
                                           </div>
                                           <div>
-                                            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Kcal</label>
+                                            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">F</label>
                                             <input
                                               type="number"
-                                              min="0"
-                                              value={editKcal}
-                                              onChange={(e) => setEditKcal(e.target.value)}
-                                              className="w-full text-sm font-bold text-slate-900 p-3.5 border border-slate-200 rounded-xl bg-slate-50/50 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                                              value={editFats}
+                                              onChange={(e) => setEditFats(e.target.value)}
+                                              className="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-900 outline-none focus:border-indigo-500 transition-all"
                                             />
                                           </div>
-                                          <div>
-                                            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Protein</label>
-                                            <input
-                                              type="number"
-                                              min="0"
-                                              value={editProteins}
-                                              onChange={(e) => setEditProteins(e.target.value)}
-                                              className="w-full text-sm font-bold text-slate-900 p-3.5 border border-slate-200 rounded-xl bg-slate-50/50 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
-                                            />
-                                          </div>
-                                          <div className="grid grid-cols-2 gap-2 col-span-2 sm:col-span-1">
-                                            <div>
-                                              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Carbs</label>
-                                              <input
-                                                type="number"
-                                                min="0"
-                                                value={editCarbs}
-                                                onChange={(e) => setEditCarbs(e.target.value)}
-                                                className="w-full text-sm font-bold text-slate-900 p-3.5 border border-slate-200 rounded-xl bg-slate-50/50 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
-                                              />
-                                            </div>
-                                            <div>
-                                              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Fats</label>
-                                              <input
-                                                type="number"
-                                                min="0"
-                                                value={editFats}
-                                                onChange={(e) => setEditFats(e.target.value)}
-                                                className="w-full text-sm font-bold text-slate-900 p-3.5 border border-slate-200 rounded-xl bg-slate-50/50 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
-                                              />
-                                            </div>
-                                          </div>
-                                          <div className="flex gap-2 col-span-2 sm:col-span-1">
-                                            <button
-                                              onClick={() => handleUpdateMeal(meal.id)}
-                                              disabled={isUpdating}
-                                              className="flex-1 bg-indigo-600 text-white rounded-xl p-3.5 text-xs font-bold hover:bg-indigo-700 shadow-indigo-100 transition-all flex items-center justify-center gap-1 active:scale-95 cursor-pointer disabled:cursor-default"
-                                            >
-                                              {isUpdating ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
-                                              Save
-                                            </button>
-                                            <button
-                                              onClick={cancelEditing}
-                                              className="p-3 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                                            >
-                                              <X className="h-4 w-4" />
-                                            </button>
-                                          </div>
+                                        </div>
+                                        <div className="flex gap-2">
+                                          <button
+                                            onClick={() => handleUpdateMeal(meal.id)}
+                                            disabled={isUpdating}
+                                            className="flex-1 bg-indigo-600 text-white rounded-xl py-3 px-4 font-black text-xs hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-100"
+                                          >
+                                            {isUpdating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                                            <span>Save</span>
+                                          </button>
+                                          <button
+                                            onClick={cancelEditing}
+                                            className="p-3 bg-white border border-slate-200 text-slate-400 hover:text-slate-600 rounded-xl transition-all"
+                                          >
+                                            <X className="h-4 w-4" />
+                                          </button>
                                         </div>
                                       </div>
                                     </div>
@@ -337,11 +348,6 @@ export default function History() {
                               )}
                             </React.Fragment>
                           ))}
-                          {day.meals.length === 0 && (
-                            <tr>
-                              <td colSpan={5} className="py-8 text-center text-slate-300 text-xs italic">No entries for this day</td>
-                            </tr>
-                          )}
                         </tbody>
                       </table>
                     </div>
@@ -351,7 +357,7 @@ export default function History() {
             )}
           </div>
         </main>
-      </div>
-    </AuthCheck>
+      </div >
+    </AuthCheck >
   )
 }

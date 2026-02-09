@@ -1,12 +1,13 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Users can only read/write their own user document and goals
+    // Users can access their own document and ANY subcollection under it
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
       
-      // Users can only read/write their own meals
-      match /meals/{mealId} {
+      // This is the CRITICAL part you were missing:
+      // It allows access to /meals, /customFoods, and any other future data.
+      match /{allPaths=**} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
     }
