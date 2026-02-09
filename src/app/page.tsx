@@ -16,7 +16,6 @@ export default function Dashboard() {
   const { user } = useAuthStore()
   const { setGoals } = useGoalStore()
   const { setTodayMeals } = useMealStore()
-  const [editingMeal, setEditingMeal] = useState<Meal | null>(null)
 
   useEffect(() => {
     if (user) {
@@ -45,19 +44,12 @@ export default function Dashboard() {
             {/* Left Column: Summary & form */}
             <div className="lg:col-span-1 space-y-8">
               <DailySummary />
-              <MealForm
-                editingMeal={editingMeal}
-                onCancelEdit={() => setEditingMeal(null)}
-              />
+              <MealForm />
             </div>
 
             {/* Right Column: Meal List */}
             <div className="lg:col-span-2">
-              <MealList onEdit={(meal) => {
-                setEditingMeal(meal)
-                // Smooth scroll to top/form on mobile
-                window.scrollTo({ top: 0, behavior: 'smooth' })
-              }} />
+              <MealList />
             </div>
           </div>
         </main>

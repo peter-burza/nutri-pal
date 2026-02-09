@@ -4,7 +4,7 @@ import { useAuthStore } from "@/stores/useAuthStore"
 import { logout } from "@/lib/firebase/auth"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { LogOut, User, History } from "lucide-react"
+import { LogOut, User, History, Bookmark } from "lucide-react"
 
 export default function Navbar() {
   const { user } = useAuthStore()
@@ -31,6 +31,13 @@ export default function Navbar() {
             >
               <History className="h-4 w-4 mr-1" />
               <span className="hidden xs:inline">History</span>
+            </Link>
+            <Link
+              href="/library"
+              className="text-slate-600 hover:text-indigo-600 px-2 py-2 rounded-md text-sm font-medium flex items-center"
+            >
+              <Bookmark className="h-4 w-4 mr-1" />
+              <span className="hidden xs:inline">Library</span>
             </Link>
             <Link
               href="/settings"
